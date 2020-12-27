@@ -1169,7 +1169,7 @@ fn main() {
         .header(search_include(&include_paths, "libavutil/imgutils.h"))
         .header(search_include(&include_paths, "libavutil/lfg.h"))
         .header(search_include(&include_paths, "libavutil/log.h"))
-        .header(search_include(&include_paths, "libavutil/lzo.h"))
+        // .header(search_include(&include_paths, "libavutil/lzo.h"))
         .header(search_include(&include_paths, "libavutil/macros.h"))
         .header(search_include(&include_paths, "libavutil/mathematics.h"))
         .header(search_include(&include_paths, "libavutil/md5.h"))

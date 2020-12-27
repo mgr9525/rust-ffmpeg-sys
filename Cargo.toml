@@ -28,7 +28,8 @@ bindgen    = "0.56"
 vcpkg = "0.2"
 
 [features]
-default  = ["avcodec", "avdevice", "avfilter", "avformat", "swresample", "swscale"]
+default  = ["avcodec", "avfilter", "avformat", "swresample", "swscale"]
+# default  = ["avcodec", "avdevice", "avfilter", "avformat", "swresample", "swscale"]
 
 static = []
 build  = ["static"]
