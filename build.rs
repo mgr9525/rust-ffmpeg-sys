@@ -441,7 +441,10 @@ fn check_features(
     let mut compiler = cc::Build::new()
         .target(&env::var("HOST").unwrap()) // don't cross-compile this
         .get_compiler().to_command();
-
+        println!("cargo:rerun-if-env-changed=CC_CONSTOM_PATH");
+    if let Ok(v)=env::var("CC_CONSTOM_PATH"){
+        compiler.env("PATH", v);
+    }
     for dir in include_paths {
         compiler.arg("-I");
         compiler.arg(dir.to_string_lossy().into_owned());
@@ -1011,7 +1014,6 @@ fn main() {
     let clang_includes = include_paths
         .iter()
         .map(|include| format!("-I{}", include.to_string_lossy()));
-
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
@@ -1110,6 +1112,16 @@ fn main() {
         .derive_eq(true)
         .size_t_is_usize(true)
         .parse_callbacks(Box::new(Callbacks));
+
+        println!("cargo:rerun-if-env-changed=BIND_CLANG_ARGES");
+        if let Ok(v)=env::var("BIND_CLANG_ARGES"){
+            let sps=v.split(" ");
+            // builder=builder.clang_args(sps);
+            for s in sps{
+                builder=builder.clang_arg(s.to_string());
+            }
+        }
+        
 
     // The input headers we would like to generate
     // bindings for.
