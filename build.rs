@@ -1225,6 +1225,12 @@ fn main() {
         builder = builder.header(search_include(&include_paths, "libavutil/hwcontext_drm.h"))
     }
 
+    let mut origin_path="".to_string();
+    println!("cargo:rerun-if-env-changed=HOST_PATH");
+    if let Ok(v)=env::var("HOST_PATH"){
+        origin_path=env::var("PATH").unwrap();
+        env::set_var("PATH",v);
+    }
     // Finish the builder and generate the bindings.
     let bindings = builder.generate()
     // Unwrap the Result and panic on failure.
@@ -1234,6 +1240,10 @@ fn main() {
     bindings
         .write_to_file(output().join("bindings.rs"))
         .expect("Couldn't write bindings!");
+    
+    if !origin_path.is_empty(){
+        env::set_var("PATH",origin_path);
+    }
 }
 
 fn print_pkg_config_libs(statik: bool, lib: &pkg_config::Library) {
