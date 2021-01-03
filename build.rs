@@ -441,8 +441,8 @@ fn check_features(
     let mut compiler = cc::Build::new()
         .target(&env::var("HOST").unwrap()) // don't cross-compile this
         .get_compiler().to_command();
-        println!("cargo:rerun-if-env-changed=CC_CONSTOM_PATH");
-    if let Ok(v)=env::var("CC_CONSTOM_PATH"){
+    println!("cargo:rerun-if-env-changed=CC_CUSTOM_PATH");
+    if let Ok(v)=env::var("CC_CUSTOM_PATH"){
         compiler.env("PATH", v);
     }
     for dir in include_paths {
@@ -567,13 +567,18 @@ fn search_include(include_paths: &[PathBuf], header: &str) -> String {
 
 fn link_to_libraries(statik: bool) {
     let ffmpeg_ty = if statik { "static" } else { "dylib" };
-    for lib in LIBRARIES {
-        let feat_is_enabled =
-            lib.feature_name().and_then(|f| env::var(&f).ok()).is_some();
-        if !lib.is_feature || feat_is_enabled {
-            println!("cargo:rustc-link-lib={}={}", ffmpeg_ty, lib.name);
+    println!("cargo:rerun-if-env-changed=LINK_SHARED_LIB");
+    match env::var("LINK_SHARED_LIB"){
+        Ok(v)=>println!("cargo:rustc-link-lib=dylib={}", v.as_str()),
+        Err(_)=>for lib in LIBRARIES {
+            let feat_is_enabled =
+                lib.feature_name().and_then(|f| env::var(&f).ok()).is_some();
+            if !lib.is_feature || feat_is_enabled {
+                println!("cargo:rustc-link-lib={}={}", ffmpeg_ty, lib.name);
+            }
         }
     }
+    
     if env::var("CARGO_FEATURE_BUILD_ZLIB").is_ok() && cfg!(target_os = "linux") {
         println!("cargo:rustc-link-lib=z");
     }
